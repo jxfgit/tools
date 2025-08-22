@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cURL 解析工具</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>cURL 解析工具</h1>
+        <p>粘贴您的 cURL 命令，工具将解析并执行该请求</p>
+
+        <form id="curlForm">
+            <div class="form-group">
+                <label for="curlCommand">cURL 命令:</label>
+                <textarea id="curlCommand" name="curl_command" rows="6" placeholder="例如: curl -X GET https://api.example.com/data -H 'Authorization: Bearer token'"></textarea>
+            </div>
+            <button type="submit">解析并执行</button>
+        </form>
+
+        <div id="results" class="hidden">
+            <h2>解析结果</h2>
+            <div class="result-section">
+                <h3>请求详情</h3>
+                <pre id="parsedDetails"></pre>
+            </div>
+
+            <div class="result-section">
+                <h3>响应结果</h3>
+                <div class="response-info">
+                    <p>状态码: <span id="statusCode"></span></p>
+                    <p>耗时: <span id="elapsedTime"></span></p>
+                </div>
+                <pre id="responseContent"></pre>
+            </div>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+    </div>
+
+    <script>
+        document.getElementById('curlForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const curlCommand = document.getElementById('curlCommand').value;
+            const resultsDiv = document.getElementById('results');
+            const errorDiv = document.getElementById('error');
+
+            // 隐藏之前的结果和错误
+            resultsDiv.classList.add('hidden');
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch('/parse-curl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'curl_command': curlCommand
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 显示解析结果
+                    document.getElementById('parsedDetails').textContent =
+                        JSON.stringify(data.parsed, null, 2);
+
+                    // 显示响应结果
+                    document.getElementById('statusCode').textContent =
+                        data.response.status_code || 'N/A';
+                    document.getElementById('elapsedTime').textContent =
+                        data.response.elapsed || 'N/A';
+
+                    if (data.response.json) {
+                        document.getElementById('responseContent').textContent =
+                            JSON.stringify(data.response.json, null, 2);
+                    } else {
+                        document.getElementById('responseContent').textContent =
+                            data.response.content || '无内容';
+                    }
+
+                    resultsDiv.classList.remove('hidden');
+                } else {
+                    // 显示错误
+                    errorDiv.textContent = '错误: ' + data.error;
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = '请求失败: ' + error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,258 +1,157 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // 初始化Vue应用
-    const { createApp } = Vue;
-
-    const app = createApp({
-        data() {
-            return {
-                results: [],
-                singleResult: {}
-            }
-        }
-    }).mount('#results');
-
-    // 获取DOM元素
-    const crawlForm = document.getElementById('crawlForm');
-    const singlePageForm = document.getElementById('singlePageForm');
+    const form = document.getElementById('crawlForm');
     const loading = document.getElementById('loading');
+    const results = document.getElementById('results');
     const errorDiv = document.getElementById('error');
-    const resultsContainer = document.getElementById('resultsContainer');
-    const singleResult = document.getElementById('singleResult');
-    const exportBtn = document.getElementById('exportBtn');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const analysisResult = document.getElementById('analysisResult');
+    const crawlBtn = document.getElementById('crawlBtn');
 
-    // 网站爬取表单提交
-    crawlForm.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const url = document.getElementById('url').value;
+        const dataType = document.getElementById('dataType').value;
         const depth = document.getElementById('depth').value;
         const maxPages = document.getElementById('maxPages').value;
 
-        // 显示加载，隐藏错误和结果
-        showLoading();
-        hideError();
-        hideResults();
+        // 显示加载状态，隐藏结果和错误
+        loading.classList.remove('hidden');
+        results.classList.add('hidden');
+        errorDiv.classList.add('hidden');
+        crawlBtn.disabled = true;
 
         try {
+            const formData = new FormData();
+            formData.append('url', url);
+            formData.append('dataType', dataType);
+            formData.append('depth', depth);
+            formData.append('maxPages', maxPages);
+
             const response = await fetch('/crawl', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    'url': url,
-                    'depth': depth,
-                    'max_pages': maxPages
-                })
+                body: formData
             });
 
             const data = await response.json();
 
             if (data.success) {
-                app.results = data.results;
-                showResults();
+                displayResults(data);
             } else {
-                showError(data.error);
+                showError(data.error || 'An unknown error occurred');
             }
         } catch (error) {
-            showError('请求失败: ' + error.message);
+            showError('Network error: ' + error.message);
         } finally {
-            hideLoading();
+            loading.classList.add('hidden');
+            crawlBtn.disabled = false;
         }
     });
 
-    // 单页提取表单提交
-    singlePageForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+    function displayResults(data) {
+        document.getElementById('pagesCount').textContent = data.pages_crawled;
+        document.getElementById('timeTaken').textContent = data.time_taken;
 
-        const url = document.getElementById('singleUrl').value;
-        const extractPattern = document.getElementById('extractPattern').value;
+        const resultsContent = document.getElementById('resultsContent');
+        resultsContent.innerHTML = '';
 
-        // 显示加载，隐藏错误和结果
-        showLoading();
-        hideError();
-        hideResults();
+        if (data.pages_crawled === 0) {
+            resultsContent.innerHTML = '<p class="error">No data could be extracted from the provided URL.</p>';
+            results.classList.remove('hidden');
+            return;
+        }
 
-        try {
-            const response = await fetch('/crawl-single', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    'url': url,
-                    'extract_pattern': extractPattern || ''
-                })
-            });
+        for (const [url, pageData] of Object.entries(data.results)) {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'page-result';
 
-            const data = await response.json();
+            const urlHeading = document.createElement('a');
+            urlHeading.className = 'page-url';
+            urlHeading.href = url;
+            urlHeading.target = '_blank';
+            urlHeading.textContent = url;
+            pageDiv.appendChild(urlHeading);
 
-            if (data.success) {
-                app.singleResult = data.result;
-                showSingleResult();
-            } else {
-                showError(data.error);
+            // 根据数据类型显示不同内容
+            if (pageData.links) {
+                const linksHeading = document.createElement('h3');
+                linksHeading.textContent = 'Links found:';
+                pageDiv.appendChild(linksHeading);
+
+                pageData.links.forEach(link => {
+                    const linkDiv = document.createElement('div');
+                    linkDiv.className = 'data-item';
+
+                    const linkEl = document.createElement('a');
+                    linkEl.href = link.url;
+                    linkEl.target = '_blank';
+                    linkEl.textContent = link.text || link.url;
+
+                    linkDiv.appendChild(linkEl);
+                    pageDiv.appendChild(linkDiv);
+                });
             }
-        } catch (error) {
-            showError('请求失败: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    });
 
-    // 导出CSV按钮点击
-    exportBtn.addEventListener('click', async function() {
-        try {
-            const response = await fetch('/export-csv', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    results: app.results
-                })
-            });
+            if (pageData.images) {
+                const imagesHeading = document.createElement('h3');
+                imagesHeading.textContent = 'Images found:';
+                pageDiv.appendChild(imagesHeading);
 
-            if (response.ok) {
-                // 创建下载链接
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `crawl_results_${Date.now()}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-            } else {
-                const data = await response.json();
-                showError(data.error || '导出失败');
+                pageData.images.forEach(image => {
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = 'data-item';
+
+                    const imgEl = document.createElement('img');
+                    imgEl.src = image.src;
+                    imgEl.alt = image.alt;
+                    imgEl.style.maxWidth = '100%';
+                    imgEl.style.height = 'auto';
+
+                    const altText = document.createElement('p');
+                    altText.textContent = `Alt text: ${image.alt || 'None'}`;
+
+                    imgDiv.appendChild(imgEl);
+                    imgDiv.appendChild(altText);
+                    pageDiv.appendChild(imgDiv);
+                });
             }
-        } catch (error) {
-            showError('导出失败: ' + error.message);
-        }
-    });
 
-    // 分析结果按钮点击
-    analyzeBtn.addEventListener('click', async function() {
-        try {
-            const response = await fetch('/analyze', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    results: app.results
-                })
-            });
+            if (pageData.text) {
+                const textHeading = document.createElement('h3');
+                textHeading.textContent = 'Text content:';
+                pageDiv.appendChild(textHeading);
 
-            const data = await response.json();
-
-            if (data.success) {
-                showAnalysis(data.analysis);
-            } else {
-                showError(data.error);
+                const textDiv = document.createElement('div');
+                textDiv.className = 'data-item';
+                textDiv.textContent = pageData.text.length > 500 ?
+                    pageData.text.substring(0, 500) + '...' :
+                    pageData.text;
+                pageDiv.appendChild(textDiv);
             }
-        } catch (error) {
-            showError('分析失败: ' + error.message);
+
+            if (pageData.metadata) {
+                const metaHeading = document.createElement('h3');
+                metaHeading.textContent = 'Metadata:';
+                pageDiv.appendChild(metaHeading);
+
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'data-item';
+
+                for (const [key, value] of Object.entries(pageData.metadata)) {
+                    const metaItem = document.createElement('p');
+                    metaItem.innerHTML = `<strong>${key}:</strong> ${value || 'Not specified'}`;
+                    metaDiv.appendChild(metaItem);
+                }
+
+                pageDiv.appendChild(metaDiv);
+            }
+
+            resultsContent.appendChild(pageDiv);
         }
-    });
 
-    // 显示/隐藏函数
-    function showLoading() {
-        loading.classList.remove('hidden');
-    }
-
-    function hideLoading() {
-        loading.classList.add('hidden');
+        results.classList.remove('hidden');
     }
 
     function showError(message) {
-        errorDiv.textContent = message;
         errorDiv.classList.remove('hidden');
+        document.getElementById('errorMessage').textContent = message;
     }
-
-    function hideError() {
-        errorDiv.classList.add('hidden');
-    }
-
-    function showResults() {
-        resultsContainer.classList.remove('hidden');
-        singleResult.classList.add('hidden');
-        analysisResult.classList.add('hidden');
-    }
-
-    function showSingleResult() {
-        singleResult.classList.remove('hidden');
-        resultsContainer.classList.add('hidden');
-        analysisResult.classList.add('hidden');
-    }
-
-    function hideResults() {
-        resultsContainer.classList.add('hidden');
-        singleResult.classList.add('hidden');
-    }
-
-    function showAnalysis(analysis) {
-        analysisResult.classList.remove('hidden');
-
-        // 创建分析结果HTML
-        analysisResult.innerHTML = `
-            <h4>分析结果</h4>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-value">${analysis.total_pages}</div>
-                    <div class="stat-label">总页面数</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${analysis.total_words}</div>
-                    <div class="stat-label">总字数</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${analysis.total_images}</div>
-                    <div class="stat-label">总图片数</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${analysis.total_links}</div>
-                    <div class="stat-label">总链接数</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${Math.round(analysis.avg_words_per_page)}</div>
-                    <div class="stat-label">平均每页字数</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${Math.round(analysis.avg_images_per_page)}</div>
-                    <div class="stat-label">平均每页图片数</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${Math.round(analysis.avg_links_per_page)}</div>
-                    <div class="stat-label">平均每页链接数</div>
-                </div>
-            </div>
-            ${analysis.common_words.length > 0 ? `
-                <div>
-                    <h5>常见词汇:</h5>
-                    <ul>
-                        ${analysis.common_words.map(item => `<li>${item[0]} (${item[1]}次)</li>`).join('')}
-                    </ul>
-                </div>
-            ` : ''}
-        `;
-    }
-
-    // 平滑滚动到锚点
-    document.querySelectorAll('nav a').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
 });

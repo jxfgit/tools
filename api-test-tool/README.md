@@ -12,6 +12,7 @@ api-test-tool/
 │   └── index.html
 ├── static/
 │   └── style.css
+│   └── script.js
 └── requirements.txt
 ```
 
@@ -760,7 +761,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 1. 创建项目目录并添加上述文件
 2. 安装依赖：`pip install -r requirements.txt`
-3. 运行应用：`uvicorn main:app --reload`
+3. 运行应用：`uvicorn main:app --reload --host 0.0.0.0 --port 8000`
 4. 打开浏览器访问：http://localhost:8000
 
 ## 功能特点

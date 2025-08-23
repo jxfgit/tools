@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页爬虫工具</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>网页爬虫工具</h1>
+            <p>抓取、分析和提取网页内容</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#crawl-website">网站爬取</a></li>
+                <li><a href="#single-page">单页提取</a></li>
+                <li><a href="#results">结果分析</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="crawl-website" class="section">
+            <h2>网站爬取</h2>
+            <form id="crawlForm" class="form">
+                <div class="form-group">
+                    <label for="url">网站URL:</label>
+                    <input type="url" id="url" name="url" placeholder="https://example.com" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="depth">爬取深度:</label>
+                        <select id="depth" name="depth">
+                            <option value="1">1 - 只爬取首页</option>
+                            <option value="2">2 - 首页+一层内链</option>
+                            <option value="3">3 - 首页+两层内链</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maxPages">最大页面数:</label>
+                        <input type="number" id="maxPages" name="maxPages" min="1" max="50" value="10">
+                    </div>
+                </div>
+
+                <button type="submit" id="crawlBtn">开始爬取</button>
+            </form>
+        </section>
+
+        <section id="single-page" class="section">
+            <h2>单页内容提取</h2>
+            <form id="singlePageForm" class="form">
+                <div class="form-group">
+                    <label for="singleUrl">页面URL:</label>
+                    <input type="url" id="singleUrl" name="url" placeholder="https://example.com/page" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="extractPattern">提取模式 (CSS选择器或正则表达式):</label>
+                    <input type="text" id="extractPattern" name="extractPattern" placeholder="例如: h1, .content, 或正则表达式">
+                </div>
+
+                <button type="submit" id="singlePageBtn">提取内容</button>
+            </form>
+        </section>
+
+        <section id="results" class="section">
+            <h2>爬取结果</h2>
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>正在爬取，请稍候...</p>
+            </div>
+
+            <div id="error" class="error hidden"></div>
+
+            <div id="resultsContainer" class="hidden">
+                <div class="results-header">
+                    <h3>爬取统计</h3>
+                    <div class="action-buttons">
+                        <button id="exportBtn">导出CSV</button>
+                        <button id="analyzeBtn">分析结果</button>
+                    </div>
+                </div>
+
+                <div id="analysisResult" class="analysis-result hidden"></div>
+
+                <div class="results-grid">
+                    <div class="result-card" v-for="result in results" :key="result.url">
+                        <h4>{{ result.title }}</h4>
+                        <p class="url">{{ result.url }}</p>
+                        <p class="description" v-if="result.meta_description">{{ result.meta_description }}</p>
+                        <div class="stats">
+                            <span>字数: {{ result.word_count }}</span>
+                            <span>图片: {{ result.image_count }}</span>
+                            <span>链接: {{ result.link_count }}</span>
+                        </div>
+                        <div class="h1-tags" v-if="result.h1_tags && result.h1_tags.length">
+                            <strong>H1标签:</strong>
+                            <ul>
+                                <li v-for="h1 in result.h1_tags">{{ h1 }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="singleResult" class="single-result hidden">
+                <h3>单页提取结果</h3>
+                <div v-if="singleResult.success">
+                    <h4>{{ singleResult.title }}</h4>
+                    <p class="url">{{ singleResult.url }}</p>
+
+                    <div v-if="singleResult.extracted_data && singleResult.extracted_data.length">
+                        <h5>提取的内容:</h5>
+                        <ul>
+                            <li v-for="item in singleResult.extracted_data">{{ item }}</li>
+                        </ul>
+                    </div>
+
+                    <div class="content-preview">
+                        <h5>内容预览:</h5>
+                        <pre>{{ singleResult.content }}</pre>
+                    </div>
+                </div>
+                <div v-else>
+                    <p class="error">提取失败: {{ singleResult.error }}</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 网页爬虫工具 - 使用 FastAPI 构建</p>
+            <p class="disclaimer">注意: 请确保您有权限爬取目标网站，并遵守robots.txt和网站使用条款</p>
+        </div>
+    </footer>
+
+    <!-- 引入Vue.js用于简单数据绑定 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>

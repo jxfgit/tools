@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Crawler Tool</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Web Crawler Tool</h1>
+        <p>Enter a URL and select what data you want to extract from the website.</p>
+
+        <form id="crawlForm">
+            <div class="form-group">
+                <label for="url">Website URL:</label>
+                <input type="url" id="url" name="url" placeholder="https://example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dataType">Data to Extract:</label>
+                <select id="dataType" name="dataType">
+                    <option value="links">Links</option>
+                    <option value="images">Images</option>
+                    <option value="text">Text Content</option>
+                    <option value="metadata">Metadata</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="depth">Crawl Depth:</label>
+                <input type="number" id="depth" name="depth" min="1" max="3" value="1">
+                <span class="help">(1 = only this page, 2 = include linked pages, etc.)</span>
+            </div>
+
+            <div class="form-group">
+                <label for="maxPages">Maximum Pages:</label>
+                <input type="number" id="maxPages" name="maxPages" min="1" max="50" value="10">
+            </div>
+
+            <button type="submit" id="crawlBtn">Start Crawling</button>
+        </form>
+
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p>Crawling in progress... Please wait.</p>
+        </div>
+
+        <div id="results" class="hidden">
+            <h2>Crawling Results</h2>
+            <div class="summary">
+                <p>Crawled <span id="pagesCount">0</span> pages in <span id="timeTaken">0</span> seconds.</p>
+            </div>
+            <div id="resultsContent"></div>
+        </div>
+
+        <div id="error" class="hidden">
+            <h2>Error</h2>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API自动化测试工具</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>API自动化测试工具</h1>
+
+        <div class="tabs">
+            <button class="tab-link active" onclick="openTab('single-test')">单接口测试</button>
+            <button class="tab-link" onclick="openTab('test-suite')">测试套件</button>
+            <button class="tab-link" onclick="openTab('test-results')">测试结果</button>
+        </div>
+
+        <div id="single-test" class="tab-content active">
+            <h2>单接口测试</h2>
+            <form id="single-test-form">
+                <div class="form-group">
+                    <label for="name">测试名称:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="url">请求URL:</label>
+                    <input type="url" id="url" name="url" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="method">HTTP方法:</label>
+                    <select id="method" name="method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="PATCH">PATCH</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="headers">请求头 (JSON):</label>
+                    <textarea id="headers" name="headers" rows="3" placeholder='{"Content-Type": "application/json"}'></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="params">查询参数 (JSON):</label>
+                    <textarea id="params" name="params" rows="3" placeholder='{"key": "value"}'></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="body">请求体 (JSON):</label>
+                    <textarea id="body" name="body" rows="5" placeholder='{"key": "value"}'></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="expected_status">期望状态码:</label>
+                    <input type="number" id="expected_status" name="expected_status" value="200">
+                </div>
+
+                <button type="button" onclick="runSingleTest()">运行测试</button>
+            </form>
+
+            <div id="single-test-result" class="result-container"></div>
+        </div>
+
+        <div id="test-suite" class="tab-content">
+            <h2>测试套件管理</h2>
+            <button onclick="showCreateSuiteForm()">创建新测试套件</button>
+
+            <div id="create-suite-form" class="form-container" style="display: none;">
+                <h3>创建测试套件</h3>
+                <form id="suite-form">
+                    <div class="form-group">
+                        <label for="suite-name">套件名称:</label>
+                        <input type="text" id="suite-name" name="name" required>
+                    </div>
+
+                    <div id="suite-test-cases">
+                        <h4>测试用例</h4>
+                        <div class="test-case" id="test-case-0">
+                            <h5>测试用例 #1</h5>
+                            <div class="form-group">
+                                <label>名称:</label>
+                                <input type="text" name="test_cases-0-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>URL:</label>
+                                <input type="url" name="test_cases-0-url" required>
+                            </div>
+                            <div class="form-group">
+                                <label>方法:</label>
+                                <select name="test_cases-0-method">
+                                    <option value="GET">GET</option>
+                                    <option value="POST">POST</option>
+                                    <option value="PUT">PUT</option>
+                                    <option value="DELETE">DELETE</option>
+                                    <option value="PATCH">PATCH</option>
+                                </select>
+                            </div>
+                            <button type="button" onclick="removeTestCase(0)">移除</button>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="addTestCase()">添加测试用例</button>
+                    <button type="button" onclick="saveTestSuite()">保存测试套件</button>
+                </form>
+            </div>
+
+            <div id="suite-list">
+                <h3>测试套件列表</h3>
+                <div id="suites-container"></div>
+            </div>
+        </div>
+
+        <div id="test-results" class="tab-content">
+            <h2>测试结果</h2>
+            <div id="results-container"></div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

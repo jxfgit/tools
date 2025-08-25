@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3e23242f-bc8b-47cf-9b62-2573fea11089" name="更改" comment="commit">
-      <change afterPath="$PROJECT_DIR$/curl_parser_tool/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/json_formatter_tool/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/json_formatter_tool/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/json_formatter_tool/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/json_formatter_tool/static/script.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/json_formatter_tool/static/style.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/json_formatter_tool/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" />
-    </list>
+    <list default="true" id="3e23242f-bc8b-47cf-9b62-2573fea11089" name="更改" comment="commit" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -93,7 +82,7 @@
       <option name="presentableId" value="Default" />
       <updated>1755835352066</updated>
       <workItem from="1755835353228" duration="4812000" />
-      <workItem from="1755862339040" duration="18000" />
+      <workItem from="1755862339040" duration="35000" />
     </task>
     <task id="LOCAL-00001" summary="commit">
       <option name="closed" value="true" />
@@ -135,7 +124,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755840592773</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="commit">
+      <option name="closed" value="true" />
+      <created>1755862365486</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1755862365487</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- 搜索框 -->
+<section class="search-section">
+    <form action="/search" method="get">
+        <input type="text" name="q" placeholder="搜索网址..." value="{{ search_query or '' }}">
+        <button type="submit">搜索</button>
+    </form>
+</section>
+
+<!-- 添加网址表单 -->
+<section class="add-site-section">
+    <h2>添加新网址</h2>
+    <form action="/add-site" method="post">
+        <input type="text" name="name" placeholder="网站名称" required>
+        <input type="url" name="url" placeholder="网址 (包含 http:// 或 https://)" required>
+        <select name="category" required>
+            <option value="">选择分类</option>
+            {% for category in categories %}
+            <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+        <textarea name="description" placeholder="网站描述"></textarea>
+        <button type="submit">添加</button>
+    </form>
+</section>
+
+<!-- 网址列表 -->
+{% if search_results %}
+    <!-- 显示搜索结果 -->
+    <section class="search-results">
+        <h2>搜索结果 ({{ search_results|length }})</h2>
+        <div class="sites-grid">
+            {% for site in search_results %}
+            <div class="site-card">
+                <a href="{{ site.url }}" target="_blank" class="site-link">
+                    <h3>{{ site.name }}</h3>
+                    <p>{{ site.description }}</p>
+                    <span class="category">{{ site.category }}</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+{% else %}
+    <!-- 按分类显示所有网址 -->
+    {% for category, site_list in sites.items() %}
+    <section class="category-section">
+        <h2>{{ category }}</h2>
+        <div class="sites-grid">
+            {% for site in site_list %}
+            <div class="site-card">
+                <a href="{{ site.url }}" target="_blank" class="site-link">
+                    <h3>{{ site.name }}</h3>
+                    <p>{{ site.description }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endfor %}
+{% endif %}
+{% endblock %}

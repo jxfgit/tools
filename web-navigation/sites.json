@@ -1,0 +1,45 @@
+{
+  "常用网站": [
+    {
+      "name": "百度",
+      "url": "https://www.baidu.com",
+      "description": "百度一下，你就知道"
+    },
+    {
+      "name": "谷歌",
+      "url": "https://www.google.com",
+      "description": "全球最大的搜索引擎"
+    }
+  ],
+  "技术学习": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com",
+      "description": "全球最大的代码托管平台"
+    },
+    {
+      "name": "Stack Overflow",
+      "url": "https://stackoverflow.com",
+      "description": "程序员问答社区"
+    },
+    {
+      "name": "CSDN",
+      "url": "https://www.csdn.net/",
+      "description": "社区"
+    }
+  ],
+  "新闻资讯": [
+    {
+      "name": "新浪新闻",
+      "url": "https://news.sina.com.cn",
+      "description": "新浪新闻中心"
+    }
+  ],
+  "娱乐休闲": [
+    {
+      "name": "4399小游戏",
+      "url": "https://www.4399.com/",
+      "description": "小游戏"
+    }
+  ]
+}

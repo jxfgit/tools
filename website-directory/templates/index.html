@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网址大全</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-bookmark"></i> 网址大全</h1>
+            <p>收集并分享有用的网站资源</p>
+        </header>
+
+        <div class="controls">
+            <button id="addWebsiteBtn" class="btn-primary">
+                <i class="fas fa-plus"></i> 添加新网址
+            </button>
+            <input type="text" id="searchInput" placeholder="搜索网址...">
+            <select id="categoryFilter">
+                <option value="">所有分类</option>
+                <!-- 分类选项将通过JS动态添加 -->
+            </select>
+        </div>
+
+        <div class="modal" id="addWebsiteModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>添加新网址</h2>
+                <form id="websiteForm">
+                    <div class="form-group">
+                        <label for="title">网站名称:</label>
+                        <input type="text" id="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="url">网址:</label>
+                        <input type="url" id="url" placeholder="https://example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">分类:</label>
+                        <input type="text" id="category" list="categories" required>
+                        <datalist id="categories">
+                            <!-- 分类选项将通过JS动态添加 -->
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">描述 (可选):</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">添加网址</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="websitesContainer" class="websites-grid">
+            <!-- 网址卡片将通过JS动态添加 -->
+        </div>
+
+        <footer>
+            <p>© 2023 网址大全 - 使用 FastAPI 构建</p>
+        </footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
